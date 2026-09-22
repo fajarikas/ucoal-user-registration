@@ -16,24 +16,19 @@ import (
 )
 
 func main() {
-	// Load environment variables
 	if err := godotenv.Load(); err != nil {
 		log.Println("[INFO] File .env tidak ditemukan, menggunakan environment system")
 	}
 
-	// Initialize database
 	config.InitDB()
 
-	// Initialize services & handlers
 	emailService := services.NewEmailService()
 	userHandler := handlers.NewUserHandler(emailService)
 
-	// Create Fiber app
 	app := fiber.New(fiber.Config{
 		AppName: "Ucoal User Registration API",
 	})
 
-	// Middlewares
 	app.Use(recover.New())
 	app.Use(logger.New(logger.Config{
 		Format: "[${time}] ${status} - ${method} ${path} (${latency})\n",
@@ -44,7 +39,6 @@ func main() {
 		AllowMethods: "GET, POST, OPTIONS",
 	}))
 
-	// Routes
 	api := app.Group("/api")
 	api.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
@@ -56,7 +50,6 @@ func main() {
 	api.Get("/users", userHandler.GetUsers)
 	api.Get("/smtp-info", userHandler.GetSMTPInfo)
 
-	// Port
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"

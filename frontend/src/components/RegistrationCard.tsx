@@ -116,7 +116,6 @@ export default function RegistrationCard({ smtpMailboxUrl }: RegistrationCardPro
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Nama Lengkap */}
         <div>
           <label className="block text-xs font-medium text-slate-300 mb-1.5">
             Nama Lengkap <span className="text-rose-400">*</span>
@@ -137,7 +136,6 @@ export default function RegistrationCard({ smtpMailboxUrl }: RegistrationCardPro
           </div>
         </div>
 
-        {/* Email */}
         <div>
           <label className="block text-xs font-medium text-slate-300 mb-1.5">
             Alamat Email <span className="text-rose-400">*</span>
@@ -158,7 +156,6 @@ export default function RegistrationCard({ smtpMailboxUrl }: RegistrationCardPro
           </div>
         </div>
 
-        {/* Password */}
         <div>
           <label className="block text-xs font-medium text-slate-300 mb-1.5">
             Password <span className="text-rose-400">*</span>
@@ -186,7 +183,6 @@ export default function RegistrationCard({ smtpMailboxUrl }: RegistrationCardPro
           </div>
         </div>
 
-        {/* Konfirmasi Password */}
         <div>
           <label className="block text-xs font-medium text-slate-300 mb-1.5">
             Konfirmasi Password <span className="text-rose-400">*</span>

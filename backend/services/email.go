@@ -47,8 +47,6 @@ func (s *EmailService) SendRegistrationNotification(toEmail, userName string) er
 
 	subject := "Pendaftaran Berhasil"
 	body := fmt.Sprintf("Halo %s,\n\nPendaftaran akun Anda berhasil. Anda telah terdaftar dalam sistem.\n\nTerima kasih.", userName)
-
-	// Clean headers
 	headers := make(map[string]string)
 	headers["From"] = s.Sender
 	headers["To"] = toEmail

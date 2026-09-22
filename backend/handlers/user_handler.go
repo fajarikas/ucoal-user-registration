@@ -57,7 +57,6 @@ func (h *UserHandler) Register(c *fiber.Ctx) error {
 		})
 	}
 
-	// Check if user with same email exists
 	var existing models.User
 	if err := config.DB.Where("email = ?", req.Email).First(&existing).Error; err == nil {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
@@ -65,7 +64,6 @@ func (h *UserHandler) Register(c *fiber.Ctx) error {
 		})
 	}
 
-	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -85,7 +83,6 @@ func (h *UserHandler) Register(c *fiber.Ctx) error {
 		})
 	}
 
-	// Send notification email asynchronously or synchronously
 	emailErr := h.emailService.SendRegistrationNotification(user.Email, user.Name)
 	emailStatus := "Email notifikasi berhasil dikirim via Ethereal SMTP"
 	if emailErr != nil {

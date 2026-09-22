@@ -11,7 +11,6 @@ body {
   min-height: 100vh;
 }
 
-/* Glassmorphism helpers */
 .glass-panel {
   background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(16px);
@@ -39,7 +38,6 @@ body {
   background: rgba(2, 6, 23, 0.85);
 }
 
-/* Subtle scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

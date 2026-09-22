@@ -5,6 +5,6 @@ export const useSmtpInfo = () => {
   return useQuery({
     queryKey: ["smtp-info"],
     queryFn: getSmtpInfo,
-    staleTime: 5 * 60 * 1000, // 5 minutes fresh
+    staleTime: 5 * 60 * 1000,
   });
 };

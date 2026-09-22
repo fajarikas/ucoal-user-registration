@@ -25,8 +25,6 @@ func InitDB() *gorm.DB {
 	if err != nil {
 		log.Fatalf("Gagal terhubung ke database SQLite: %v", err)
 	}
-
-	// Auto Migrate
 	err = db.AutoMigrate(&models.User{})
 	if err != nil {
 		log.Fatalf("Gagal migrasi database: %v", err)

@@ -26,7 +26,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Top Navbar */}
       <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -66,9 +65,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
-        {/* Hero Section */}
         <div className="text-center max-w-2xl mx-auto mb-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-3">
             <Activity className="w-3.5 h-3.5" />
@@ -82,19 +79,15 @@ export default function Home() {
           </p>
         </div>
 
-        {/* SMTP Status banner */}
         <SmtpStatusCard smtpInfo={smtpInfo} loading={loadingSmtp} />
 
-        {/* Two-Column Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Registration Form (7 cols) */}
           <div className="lg:col-span-7">
             <RegistrationCard
               smtpMailboxUrl={smtpInfo?.web_mailbox || "https://ethereal.email/messages"}
             />
           </div>
 
-          {/* User List (5 cols) */}
           <div className="lg:col-span-5 h-full">
             <UserListCard
               users={usersData?.users || []}
@@ -104,7 +97,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Tech Stack Badges */}
         <div className="pt-6 border-t border-slate-800/80">
           <h3 className="text-xs uppercase font-semibold text-slate-500 tracking-wider text-center mb-4">
             Teknologi yang Digunakan
@@ -130,7 +122,6 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
         <p>Ucoal Technical Test &copy; {new Date().getFullYear()} - Fajar Ika Saputra</p>
       </footer>
