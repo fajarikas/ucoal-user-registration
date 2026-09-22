@@ -2,20 +2,14 @@
 
 import React from "react";
 import { MailCheck, ExternalLink, Server, ShieldCheck } from "lucide-react";
-
-interface SmtpInfo {
-  host: string;
-  port: string;
-  sender: string;
-  account: string;
-  web_mailbox: string;
-}
+import { SmtpInfo } from "@/types/user";
 
 interface SmtpStatusCardProps {
-  smtpInfo: SmtpInfo | null;
+  smtpInfo: SmtpInfo | null | undefined;
+  loading?: boolean;
 }
 
-export default function SmtpStatusCard({ smtpInfo }: SmtpStatusCardProps) {
+export default function SmtpStatusCard({ smtpInfo, loading }: SmtpStatusCardProps) {
   return (
     <div className="glass-panel rounded-2xl p-5 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div className="flex items-center gap-3">
@@ -27,7 +21,7 @@ export default function SmtpStatusCard({ smtpInfo }: SmtpStatusCardProps) {
             <span className="text-sm font-semibold text-white">Ethereal Email SMTP Gateway</span>
             <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              Aktif
+              {loading ? "Memeriksa..." : "Aktif"}
             </span>
           </div>
           <div className="text-xs text-slate-400 mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1">

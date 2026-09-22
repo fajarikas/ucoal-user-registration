@@ -1,61 +1,28 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import RegistrationCard from "@/components/RegistrationCard";
-import UserListCard, { UserItem } from "@/components/UserListCard";
+import UserListCard from "@/components/UserListCard";
 import SmtpStatusCard from "@/components/SmtpStatusCard";
+import { useUsers } from "@/hooks/useUsers";
+import { useSmtpInfo } from "@/hooks/useSmtpInfo";
 import { UserCheck, Activity, Layers, Database, Send, Terminal } from "lucide-react";
 
-interface SmtpInfo {
-  host: string;
-  port: string;
-  sender: string;
-  account: string;
-  web_mailbox: string;
-}
-
 export default function Home() {
-  const [users, setUsers] = useState<UserItem[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
-  const [smtpInfo, setSmtpInfo] = useState<SmtpInfo | null>(null);
-  const [apiConnected, setApiConnected] = useState<boolean | null>(null);
+  const {
+    data: usersData,
+    isLoading: loadingUsers,
+    isError: usersError,
+    refetch: refetchUsers,
+  } = useUsers();
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+  const {
+    data: smtpInfo,
+    isLoading: loadingSmtp,
+    isError: smtpError,
+  } = useSmtpInfo();
 
-  const fetchUsers = useCallback(async () => {
-    setLoadingUsers(true);
-    try {
-      const res = await fetch(`${apiUrl}/api/users`);
-      if (res.ok) {
-        const data = await res.json();
-        setUsers(data.users || []);
-        setApiConnected(true);
-      } else {
-        setApiConnected(false);
-      }
-    } catch {
-      setApiConnected(false);
-    } finally {
-      setLoadingUsers(false);
-    }
-  }, [apiUrl]);
-
-  const fetchSmtpInfo = useCallback(async () => {
-    try {
-      const res = await fetch(`${apiUrl}/api/smtp-info`);
-      if (res.ok) {
-        const data = await res.json();
-        setSmtpInfo(data);
-      }
-    } catch {
-      // ignore
-    }
-  }, [apiUrl]);
-
-  useEffect(() => {
-    fetchUsers();
-    fetchSmtpInfo();
-  }, [fetchUsers, fetchSmtpInfo]);
+  const apiConnected = !usersError && !smtpError;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -80,19 +47,19 @@ export default function Home() {
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs bg-slate-900 border border-slate-800">
               <span
                 className={`w-2 h-2 rounded-full ${
-                  apiConnected === true
-                    ? "bg-emerald-400 animate-pulse"
-                    : apiConnected === false
-                    ? "bg-rose-500"
-                    : "bg-amber-400"
+                  loadingUsers || loadingSmtp
+                    ? "bg-amber-400 animate-pulse"
+                    : apiConnected
+                    ? "bg-emerald-400"
+                    : "bg-rose-500"
                 }`}
               />
               <span className="text-slate-300 font-medium">
-                {apiConnected === true
+                {loadingUsers || loadingSmtp
+                  ? "Menghubungkan..."
+                  : apiConnected
                   ? "Fiber API Online"
-                  : apiConnected === false
-                  ? "Fiber API Terputus"
-                  : "Menghubungkan..."}
+                  : "Fiber API Terputus"}
               </span>
             </div>
           </div>
@@ -116,14 +83,13 @@ export default function Home() {
         </div>
 
         {/* SMTP Status banner */}
-        <SmtpStatusCard smtpInfo={smtpInfo} />
+        <SmtpStatusCard smtpInfo={smtpInfo} loading={loadingSmtp} />
 
         {/* Two-Column Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Registration Form (7 cols) */}
           <div className="lg:col-span-7">
             <RegistrationCard
-              onSuccess={fetchUsers}
               smtpMailboxUrl={smtpInfo?.web_mailbox || "https://ethereal.email/messages"}
             />
           </div>
@@ -131,9 +97,9 @@ export default function Home() {
           {/* User List (5 cols) */}
           <div className="lg:col-span-5 h-full">
             <UserListCard
-              users={users}
+              users={usersData?.users || []}
               loading={loadingUsers}
-              onRefresh={fetchUsers}
+              onRefresh={() => refetchUsers()}
             />
           </div>
         </div>
@@ -146,7 +112,7 @@ export default function Home() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300">
               <Layers className="w-4 h-4 text-sky-400" />
-              <span>Next.js 16 (App Router + TS)</span>
+              <span>Next.js 16 (React Query + Axios)</span>
             </div>
             <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300">
               <Terminal className="w-4 h-4 text-emerald-400" />

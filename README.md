@@ -1,7 +1,7 @@
 # Ucoal User Registration System with Email Notification
 
 Sistem pendaftaran pengguna (User Registration) dengan notifikasi email otomatis menggunakan arsitektur modern:
-- **Frontend**: [Next.js](https://nextjs.org/) (React 19 + TypeScript + Tailwind CSS)
+- **Frontend**: [Next.js](https://nextjs.org/) (React 19 + TypeScript + TanStack React Query + Axios + Tailwind CSS)
 - **Backend**: [Golang](https://go.dev/) ([Fiber v2](https://gofiber.io/))
 - **Database**: SQLite dengan [GORM](https://gorm.io/)
 - **Email Service**: SMTP menggunakan [Ethereal Email](https://ethereal.email/)
@@ -20,7 +20,7 @@ Sistem pendaftaran pengguna (User Registration) dengan notifikasi email otomatis
 3. **Penyimpanan Database**:
    - Data user tersimpan secara persisten pada SQLite database (`users.db`).
 4. **Daftar User & Monitoring SMTP**:
-   - Menampilkan daftar pengguna yang telah terdaftar secara real-time.
+   - Menampilkan daftar pengguna yang telah terdaftar secara real-time dengan React Query (`useQuery` & `useMutation`).
    - Informasi koneksi SMTP dan akses langsung ke web mailbox Ethereal Email.
 
 ---
@@ -45,12 +45,23 @@ ucoal-test/
 │   └── main.go                # Server entry point & routing Fiber
 ├── frontend/
 │   ├── src/
+│   │   ├── api/
+│   │   │   ├── base-axios.ts  # Axios instance & configuration
+│   │   │   └── user.ts        # Typed API functions (getUsers, registerUser, getSmtpInfo)
+│   │   ├── hooks/
+│   │   │   ├── useUsers.ts    # React Query hook useQuery for users list
+│   │   │   ├── useSmtpInfo.ts # React Query hook useQuery for SMTP status
+│   │   │   └── useRegisterUser.ts # React Query hook useMutation for registration
+│   │   ├── providers/
+│   │   │   └── QueryProvider.tsx # TanStack QueryClientProvider wrapper
+│   │   ├── types/
+│   │   │   └── user.ts        # TypeScript interfaces for API & Models
 │   │   ├── app/
 │   │   │   ├── globals.css    # Styling & Glassmorphism design
-│   │   │   ├── layout.tsx     # Root Layout Next.js
+│   │   │   ├── layout.tsx     # Root Layout Next.js with QueryProvider
 │   │   │   └── page.tsx       # Halaman utama aplikasi
 │   │   └── components/
-│   │       ├── RegistrationCard.tsx  # Form registrasi user
+│   │       ├── RegistrationCard.tsx  # Form registrasi user dengan useRegisterUser
 │   │       ├── UserListCard.tsx      # Tabel/Daftar user terdaftar
 │   │       └── SmtpStatusCard.tsx    # Informasi & status gateway SMTP
 │   ├── package.json

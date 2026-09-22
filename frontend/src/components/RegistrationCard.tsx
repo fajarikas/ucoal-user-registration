@@ -2,94 +2,65 @@
 
 import React, { useState } from "react";
 import { User, Mail, Lock, Eye, EyeOff, CheckCircle2, AlertCircle, Loader2, ExternalLink } from "lucide-react";
+import { useRegisterUser } from "@/hooks/useRegisterUser";
+import { RegisterResponse } from "@/types/user";
 
 interface RegistrationCardProps {
-  onSuccess: () => void;
   smtpMailboxUrl: string;
 }
 
-export default function RegistrationCard({ onSuccess, smtpMailboxUrl }: RegistrationCardProps) {
+export default function RegistrationCard({ smtpMailboxUrl }: RegistrationCardProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [successData, setSuccessData] = useState<{
-    name: string;
-    email: string;
-    emailStatus: string;
-  } | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [successData, setSuccessData] = useState<RegisterResponse | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const registerMutation = useRegisterUser();
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg(null);
+    setValidationError(null);
 
     if (!name.trim()) {
-      setErrorMsg("Nama lengkap tidak boleh kosong.");
+      setValidationError("Nama lengkap tidak boleh kosong.");
       return;
     }
     if (!email.trim() || !email.includes("@")) {
-      setErrorMsg("Masukkan alamat email yang valid.");
+      setValidationError("Masukkan alamat email yang valid.");
       return;
     }
     if (password.length < 6) {
-      setErrorMsg("Password minimal harus 6 karakter.");
+      setValidationError("Password minimal harus 6 karakter.");
       return;
     }
     if (password !== confirmPassword) {
-      setErrorMsg("Konfirmasi password tidak cocok dengan password.");
+      setValidationError("Konfirmasi password tidak cocok dengan password.");
       return;
     }
 
-    setLoading(true);
-
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-      const res = await fetch(`${apiUrl}/api/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    registerMutation.mutate(
+      {
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+      },
+      {
+        onSuccess: (data) => {
+          setSuccessData(data);
+          setName("");
+          setEmail("");
+          setPassword("");
+          setConfirmPassword("");
         },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim().toLowerCase(),
-          password,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Gagal melakukan registrasi");
       }
-
-      setSuccessData({
-        name: data.user.name,
-        email: data.user.email,
-        emailStatus: data.email_status,
-      });
-
-      // Clear form inputs
-      setName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-
-      // Trigger user list refresh
-      onSuccess();
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setErrorMsg(err.message);
-      } else {
-        setErrorMsg("Terjadi kesalahan saat memproses pendaftaran.");
-      }
-    } finally {
-      setLoading(false);
-    }
+    );
   };
+
+  const activeError = validationError || (registerMutation.error ? registerMutation.error.message : null);
 
   return (
     <div className="glass-panel rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-800">
@@ -102,10 +73,10 @@ export default function RegistrationCard({ onSuccess, smtpMailboxUrl }: Registra
         </p>
       </div>
 
-      {errorMsg && (
+      {activeError && (
         <div className="mb-5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm flex items-start gap-2.5">
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-rose-400" />
-          <div className="flex-1 leading-relaxed">{errorMsg}</div>
+          <div className="flex-1 leading-relaxed">{activeError}</div>
         </div>
       )}
 
@@ -116,10 +87,10 @@ export default function RegistrationCard({ onSuccess, smtpMailboxUrl }: Registra
             <div className="flex-1">
               <h4 className="font-semibold text-emerald-300">Pendaftaran Berhasil!</h4>
               <p className="text-sm text-emerald-200/90 mt-1">
-                User <span className="font-semibold">{successData.name}</span> ({successData.email}) telah tersimpan di database.
+                User <span className="font-semibold">{successData.user.name}</span> ({successData.user.email}) telah tersimpan di database.
               </p>
               <div className="mt-2.5 text-xs bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-500/20 text-emerald-300">
-                <span className="font-medium text-emerald-400">Status Email:</span> {successData.emailStatus}
+                <span className="font-medium text-emerald-400">Status Email:</span> {successData.email_status}
               </div>
 
               <div className="mt-3.5 flex flex-wrap gap-2">
@@ -157,7 +128,7 @@ export default function RegistrationCard({ onSuccess, smtpMailboxUrl }: Registra
             <input
               type="text"
               required
-              disabled={loading}
+              disabled={registerMutation.isPending}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Contoh: Budi Santoso"
@@ -178,7 +149,7 @@ export default function RegistrationCard({ onSuccess, smtpMailboxUrl }: Registra
             <input
               type="email"
               required
-              disabled={loading}
+              disabled={registerMutation.isPending}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="nama@perusahaan.com"
@@ -199,7 +170,7 @@ export default function RegistrationCard({ onSuccess, smtpMailboxUrl }: Registra
             <input
               type={showPassword ? "text" : "password"}
               required
-              disabled={loading}
+              disabled={registerMutation.isPending}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Minimal 6 karakter"
@@ -227,7 +198,7 @@ export default function RegistrationCard({ onSuccess, smtpMailboxUrl }: Registra
             <input
               type={showPassword ? "text" : "password"}
               required
-              disabled={loading}
+              disabled={registerMutation.isPending}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Ulangi password di atas"
@@ -238,10 +209,10 @@ export default function RegistrationCard({ onSuccess, smtpMailboxUrl }: Registra
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={registerMutation.isPending}
           className="w-full mt-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-[0.99] transition duration-150 flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {loading ? (
+          {registerMutation.isPending ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
               <span>Memproses & Mengirim Email...</span>

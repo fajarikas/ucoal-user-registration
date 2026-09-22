@@ -2,16 +2,10 @@
 
 import React from "react";
 import { Users, RefreshCw, Calendar, CheckCircle } from "lucide-react";
-
-export interface UserItem {
-  id: number;
-  name: string;
-  email: string;
-  created_at: string;
-}
+import { User } from "@/types/user";
 
 interface UserListCardProps {
-  users: UserItem[];
+  users: User[];
   loading: boolean;
   onRefresh: () => void;
 }
