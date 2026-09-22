@@ -98,6 +98,9 @@ cd frontend
 # Install dependensi
 npm install
 
+# Salin file environment jika diperlukan
+cp .env.example .env.local
+
 # Jalankan development server
 npm run dev
 ```
